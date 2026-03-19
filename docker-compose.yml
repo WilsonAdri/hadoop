@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  namenode:
+    build: ./m1-hadoop
+    container_name: namenode
+    hostname: namenode
+    ports:
+      - "50070:50070" 
+      - "8088:8088"   
+    networks:
+      - hadoop-net
+    command: bash -c "hdfs namenode -format -force -nonInteractive && hadoop-daemon.sh start namenode && yarn-daemon.sh start resourcemanager && tail -f /dev/null"
+
+  datanode1:
+    build: ./m1-hadoop
+    container_name: datanode1
+    hostname: datanode1
+    depends_on:
+      - namenode
+    networks:
+      - hadoop-net
+    command: bash -c "hadoop-daemon.sh start datanode && yarn-daemon.sh start nodemanager && tail -f /dev/null"
+
+  datanode2:
+    build: ./m1-hadoop
+    container_name: datanode2
+    hostname: datanode2
+    depends_on:
+      - namenode
+    networks:
+      - hadoop-net
+    command: bash -c "hadoop-daemon.sh start datanode && yarn-daemon.sh start nodemanager && tail -f /dev/null"
+
+networks:
+  hadoop-net:
+    driver: bridge
